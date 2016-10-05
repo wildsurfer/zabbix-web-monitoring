@@ -6,4 +6,4 @@ Out of the box it will work if your containers will have `VIRTUAL_HOST` environm
 
 Check example folder to see how it will work with Zabbix. Just run `docker-compose up -d`. Then login to Zabbix and check Web tab, you should see some web scenarios there.
 
-Tested with Zabbix 3.2
+Tested with Zabbix 3.2. May work with other versions as well
