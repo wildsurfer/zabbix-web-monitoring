@@ -1,0 +1,3 @@
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+{{ $host }}
+{{ end }}

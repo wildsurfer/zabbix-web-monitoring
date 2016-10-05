@@ -1,0 +1,67 @@
+version: '2'
+volumes:
+  pgdata:
+services:
+  zabbix-web-monitoring:
+    container_name: zabbix-web-monitoring
+    build: ../
+    environment:
+      - ZBX_API_URL=zabbix-ui
+      - ZBX_LOGIN=Admin
+      - ZBX_PASSWORD=zabbix
+      - ZBX_WEB_DELAY=30
+      - ZBX_WEB_TIMEOUT=3
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  zabbix-ui:
+    container_name: zabbix-ui
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-3.2.0
+    environment:
+      - TZ=UTC
+      - DB_SERVER_HOST=zabbix-postgres
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=FYTf765rDTStery
+      - constraint:type==monit
+    ports:
+      - 80:80
+    depends_on:
+      - zabbix-server
+  zabbix-server:
+    container_name: zabbix-server
+    image: zabbix/zabbix-server-pgsql:alpine-3.2.0
+    environment:
+      - DB_SERVER_HOST=zabbix-postgres
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=FYTf765rDTStery
+      - constraint:type==monit
+    ports:
+      - 10051
+      - 162
+    depends_on:
+      - zabbix-postgres
+    restart: always
+  zabbix-postgres:
+    container_name: zabbix-postgres
+    image: postgres:9.5.4
+    environment:
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=FYTf765rDTStery
+      - constraint:type==monit
+    ports:
+      - 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+  proxy:
+    container_name: proxy
+    image: jwilder/nginx-proxy:0.3.0
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  test1:
+    image: nginx
+    environment:
+      - VIRTUAL_HOST=google.com
+  test2:
+    image: nginx
+    environment:
+      - VIRTUAL_HOST=youtube.com
