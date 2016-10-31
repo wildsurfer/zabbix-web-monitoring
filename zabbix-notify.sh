@@ -112,7 +112,50 @@ EOF
 )
 curl -s -X POST -H 'Content-Type: application/json-rpc' -d "$TMPL_VHOST_ADD" http://$ZBX_API_URL/api_jsonrpc.php
 else
-echo "'$EP' already exists"
+echo "'$EP check' already exists"
+fi
+
+# Check if web scenario trigger already exist
+
+TMPL_TRIGGER_CHECK=$(cat << EOF
+{
+    "jsonrpc": "2.0",
+    "method": "trigger.get",
+    "params": {
+        "output": [
+            "triggerid"
+        ],
+        "filter": {
+            "description": "$EP unreachable"
+        }
+    },
+    "auth": "$TOKEN",
+    "id": 1
+}
+EOF
+)
+
+IF_TRIGGER_EXISTS=$(curl -s -X POST -H 'Content-Type: application/json-rpc' -d "$TMPL_TRIGGER_CHECK" http://$ZBX_API_URL/api_jsonrpc.php | jq ".result[0]" | jq -r ".triggerid")
+
+if [ $IF_TRIGGER_EXISTS = "null" ]
+then
+TMPL_TRIGGER_ADD=$(cat << EOF
+{
+    "jsonrpc": "2.0",
+    "method": "trigger.create",
+    "params": {
+        "description": "$EP unreachable",
+        "expression": "{Zabbix server:web.test.fail[$EP check].last(0)}<>0",
+        "priority": 4
+    },
+    "auth": "$TOKEN",
+    "id": 1
+}
+EOF
+)
+curl -s -X POST -H 'Content-Type: application/json-rpc' -d "$TMPL_TRIGGER_ADD" http://$ZBX_API_URL/api_jsonrpc.php
+else
+echo "'$EP trigger' already exists"
 fi
 
 done < endpoints.list
