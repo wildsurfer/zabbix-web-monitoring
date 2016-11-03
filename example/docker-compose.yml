@@ -15,25 +15,26 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
   zabbix-ui:
     container_name: zabbix-ui
-    image: zabbix/zabbix-web-nginx-pgsql:alpine-3.2.0
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-3.2.1
     environment:
       - TZ=UTC
       - DB_SERVER_HOST=zabbix-postgres
       - POSTGRES_USER=zabbix
       - POSTGRES_PASSWORD=FYTf765rDTStery
-      - constraint:type==monit
     ports:
       - 80:80
     depends_on:
       - zabbix-server
   zabbix-server:
     container_name: zabbix-server
-    image: zabbix/zabbix-server-pgsql:alpine-3.2.0
+    image: wildsurfer/zabbix-server-pgsql-awscli:alpine-3.2.1
     environment:
       - DB_SERVER_HOST=zabbix-postgres
       - POSTGRES_USER=zabbix
       - POSTGRES_PASSWORD=FYTf765rDTStery
-      - constraint:type==monit
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_DEFAULT_REGION
     ports:
       - 10051
       - 162
@@ -46,7 +47,6 @@ services:
     environment:
       - POSTGRES_USER=zabbix
       - POSTGRES_PASSWORD=FYTf765rDTStery
-      - constraint:type==monit
     ports:
       - 5432
     volumes:
