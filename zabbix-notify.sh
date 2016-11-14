@@ -95,7 +95,7 @@ TMPL_VHOST_ADD=$(cat << EOF
         "name": "$EP check",
         "hostid": "$HOST_ID",
         "delay": "${ZBX_WEB_DELAY:-60}",
-        "timeout": "${ZBX_WEB_TIMEOUT:-15}",
+        "timeout": "${ZBX_WEB_TIMEOUT:-60}",
         "steps": [
             {
                 "name": "Homepage",
@@ -145,7 +145,7 @@ TMPL_TRIGGER_ADD=$(cat << EOF
     "method": "trigger.create",
     "params": {
         "description": "$EP unreachable",
-        "expression": "{Zabbix server:web.test.fail[$EP check].min(2m)}<>0",
+        "expression": "{Zabbix server:web.test.fail[$EP check].count(300,1)}>=2",
         "priority": 4
     },
     "auth": "$TOKEN",
