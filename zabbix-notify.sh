@@ -145,7 +145,7 @@ TMPL_TRIGGER_ADD=$(cat << EOF
     "method": "trigger.create",
     "params": {
         "description": "$EP unreachable",
-        "expression": "{Zabbix server:web.test.fail[$EP check].count(120,1)}>=2",
+        "expression": "{Zabbix server:web.test.fail[$EP check].count(300,1)}>=2",
         "priority": 4
     },
     "auth": "$TOKEN",
